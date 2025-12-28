@@ -1,145 +1,224 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title></title>
-<link type="text/css" href="styles.css" rel="stylesheet" media="screen" />
-<script type="text/javascript" src="//use.typekit.net/prw4qdr.js"></script>
-<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-<script src="js/jquery-1.6.1.min.js" type="text/javascript"></script>
- <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
- <style >
- #hala {
- font-family: 'Lato', sans-serif;
-    position:fixed;
-    top: 50%;
-    left: 50%;
-    width:100px;
-    height:50px;
-    margin-top: -25px; /*set to a negative number 1/2 of your height*/
-    margin-left: -50px; /*set to a negative number 1/2 of your width*/
-     text-align: center;
-    font-size: 15px;
-    line-height: 50px;
-    color: #D26;
- }
- a:link {
-    color: #D26;
-    text-decoration: none;
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HALA</title>
+<link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet'>
+<style>
+* { margin: 0; padding: 0; }
+body { 
+  overflow: hidden; 
+  background: #fff;
 }
-
- a:visited {
-    color: #d03568;
+#hala {
+  font-family: 'Lato', sans-serif;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 15px;
+  color: #D26;
+  z-index: 10;
+  pointer-events: none;
 }
-
- a:hover {
-    color: #d03568;
- }
-
- a:active {
-    color: #d03568;
+#hala a {
+  pointer-events: all;
 }
- </style>
+a { 
+  color: #D26; 
+  text-decoration: none;
+  transition: color 0.3s;
+}
+a:hover { color: #d03568; }
+canvas { 
+  display: block;
+  cursor: crosshair;
+}
+</style>
 </head>
-<body style="overflow:hidden">
- <div id="hala"><a href="https://twitter.com/halae">ALAH</a></div>
-<canvas id="projector" width="100" height="100%">Your browser does not support the Canvas element.</canvas>
-<script type="text/javascript">
-		//
-		// ORGINAL EXPERIMENT FROM http://hakim.se/experiments/html5/particles/01/	
-		//
-			var VELOCITY = 1;
-			var PARTICLES = 400;
-			
-			//var mouse = {x:0, y:0};
-			var particles = [];
-			//var colors = [ "#D26","#fff000","#D26","#fff000","#fffcca", "#f989b2" ];
-			var colors = [ "#8cc356","#6bab2d",/* "#ffcc00" */"#2dab98","#ddc922","#3597d0", "#d03568" ];
-			var canvas = document.getElementById('projector');
-			var context;
+<body>
+<div id="hala"><a href="https://twitter.com/halae">HALA</a></div>
+<canvas id="projector"></canvas>
+<script>
+// Original experiment: http://hakim.se/experiments/html5/particles/01/
+// Enhanced version
 
+const CONFIG = {
+  VELOCITY: 0.2,
+  PARTICLE_DENSITY: 0.0001,
+  MAX_SIZE: 4,
+  MIN_SIZE: 1,
+  BOUNCE_DAMPING: 0.002,
+  CONNECTION_DISTANCE: 100,
+  MOUSE_INFLUENCE: 150,
+  MOUSE_STRENGTH: 0.3
+};
 
-			if (canvas && canvas.getContext) {
-				context = canvas.getContext('2d');
-				
-				for( var i = 0; i < PARTICLES; i++ ) {
-					particles.push( { 
-						x: Math.random()*window.innerWidth, 
-						y: Math.random()*window.innerHeight, 
-						vx: ((Math.random()*(VELOCITY*2))-VELOCITY),
-						vy: ((Math.random()*(VELOCITY*2))-VELOCITY),
-						size: 1+Math.random()*3,
-						color: colors[ Math.floor( Math.random() * colors.length ) ]
-					} );
-				}
-				
-				Initialize();
-			}
-			
-			function Initialize() {
- 				window.addEventListener('resize', ResizeCanvas, false);
-				setInterval( TimeUpdate, 40 );
-				
-				ResizeCanvas();
-			}
-			
-			function TimeUpdate(e) {
-				
-				context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-				
-				var len = particles.length;
-				var particle;
-				
-				for( var i = 0; i < len; i++ ) {
-					particle = particles[i];
-					
-					if (!particle.frozen) {
-						particle.x += particle.vx;
-						particle.y += particle.vy;
-						
-						if (particle.x > window.innerWidth) {
-							particle.vx = -VELOCITY - Math.random();
-						}
-						else if (particle.x < 0) {
-							particle.vx = VELOCITY + Math.random();
-						}
-						else {
-							particle.vx *= 1 + (Math.random() * 0.005);
-						}
-						
-						if (particle.y > window.innerHeight) {
-							particle.vy = -VELOCITY - Math.random();
-						}
-						else if (particle.y < 0) {
-							particle.vy = VELOCITY + Math.random();
-						}
-						else {
-							particle.vy *= 1 + (Math.random() * 0.005);
-						}
-						
- 						
-						particle.currentSize = particle.size;
-					}
-					
-					context.fillStyle = particle.color;
-					context.beginPath();
-					context.arc(particle.x,particle.y,particle.currentSize,0,Math.PI*2,true);
-					context.closePath();
-					context.fill();
-					
-				}
-			}
- 
-			function ResizeCanvas(e) {
-				canvas.width = window.innerWidth;
-				canvas.height = window.innerHeight;
-			}
-			
-			function DistanceBetween(p1,p2) {
-				var dx = p2.x-p1.x;
-				var dy = p2.y-p1.y;
-				return Math.sqrt(dx*dx + dy*dy);
-			}
-		</script>
+const colors = ["#8cc356","#6bab2d","#2dab98","#ddc922","#3597d0","#d03568"];
+const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent);
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const canvas = document.getElementById('projector');
+const context = canvas.getContext('2d');
+const particles = [];
+const mouse = { x: null, y: null };
+let isVisible = true;
+
+// Adjust settings for performance and accessibility
+if (isMobile) {
+  CONFIG.PARTICLE_DENSITY = 0.00005;
+  CONFIG.CONNECTION_DISTANCE = 60;
+}
+if (prefersReducedMotion) {
+  CONFIG.VELOCITY = 0.1;
+  CONFIG.PARTICLE_DENSITY = 0.00005;
+}
+
+function initParticles() {
+  particles.length = 0;
+  const particleCount = Math.floor(canvas.width * canvas.height * CONFIG.PARTICLE_DENSITY);
+  
+  for(let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() * (CONFIG.VELOCITY * 2)) - CONFIG.VELOCITY,
+      vy: (Math.random() * (CONFIG.VELOCITY * 2)) - CONFIG.VELOCITY,
+      size: CONFIG.MIN_SIZE + Math.random() * (CONFIG.MAX_SIZE - CONFIG.MIN_SIZE),
+      color: colors[Math.floor(Math.random() * colors.length)]
+    });
+  }
+}
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  initParticles();
+}
+
+function updateParticle(p) {
+  // Mouse interaction
+  if (mouse.x !== null && mouse.y !== null) {
+    const dx = mouse.x - p.x;
+    const dy = mouse.y - p.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    
+    if (dist < CONFIG.MOUSE_INFLUENCE) {
+      const force = (CONFIG.MOUSE_INFLUENCE - dist) / CONFIG.MOUSE_INFLUENCE;
+      p.vx -= (dx / dist) * force * CONFIG.MOUSE_STRENGTH;
+      p.vy -= (dy / dist) * force * CONFIG.MOUSE_STRENGTH;
+    }
+  }
+  
+  // Update position
+  p.x += p.vx;
+  p.y += p.vy;
+  
+  // Boundary collision with velocity adjustment
+  if (p.x > canvas.width) {
+    p.vx = -CONFIG.VELOCITY - Math.random() * CONFIG.VELOCITY;
+  } else if (p.x < 0) {
+    p.vx = CONFIG.VELOCITY + Math.random() * CONFIG.VELOCITY;
+  }
+  
+  if (p.y > canvas.height) {
+    p.vy = -CONFIG.VELOCITY - Math.random() * CONFIG.VELOCITY;
+  } else if (p.y < 0) {
+    p.vy = CONFIG.VELOCITY + Math.random() * CONFIG.VELOCITY;
+  }
+  
+  // VELOCITY LIMITER - keeps speed constant
+  const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+  const maxSpeed = CONFIG.VELOCITY * 2;
+  
+  if (speed > maxSpeed) {
+    p.vx = (p.vx / speed) * maxSpeed;
+    p.vy = (p.vy / speed) * maxSpeed;
+  }
+}
+
+function drawConnections() {
+  if (isMobile || prefersReducedMotion) return;
+  
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const p1 = particles[i];
+      const p2 = particles[j];
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      
+      if (dist < CONFIG.CONNECTION_DISTANCE) {
+        const opacity = (1 - dist / CONFIG.CONNECTION_DISTANCE) * 0.3;
+        context.strokeStyle = `rgba(140, 195, 86, ${opacity})`;
+        context.lineWidth = 0.5;
+        context.beginPath();
+        context.moveTo(p1.x, p1.y);
+        context.lineTo(p2.x, p2.y);
+        context.stroke();
+      }
+    }
+  }
+}
+
+function drawParticle(p) {
+  context.fillStyle = p.color;
+  context.beginPath();
+  context.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+  context.fill();
+}
+
+function animate() {
+  if (!isVisible) return;
+  
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw connections first (behind particles)
+  drawConnections();
+  
+  // Update and draw particles
+  particles.forEach(p => {
+    updateParticle(p);
+    drawParticle(p);
+  });
+  
+  requestAnimationFrame(animate);
+}
+
+// Event listeners
+window.addEventListener('resize', resize);
+
+window.addEventListener('mousemove', (e) => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+window.addEventListener('mouseleave', () => {
+  mouse.x = null;
+  mouse.y = null;
+});
+
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  mouse.x = e.touches[0].clientX;
+  mouse.y = e.touches[0].clientY;
+}, { passive: false });
+
+canvas.addEventListener('touchend', () => {
+  mouse.x = null;
+  mouse.y = null;
+});
+
+document.addEventListener('visibilitychange', () => {
+  isVisible = !document.hidden;
+  if (isVisible) animate();
+});
+
+// Initialize
+resize();
+animate();
+</script>
 </body>
 </html>
